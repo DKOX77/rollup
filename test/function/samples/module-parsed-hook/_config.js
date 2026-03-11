@@ -68,6 +68,7 @@ module.exports = defineTest({
 									id: ID_DEP,
 									meta: {},
 									moduleSideEffects: true,
+									phase: 'evaluation',
 									resolvedBy: 'rollup',
 									syntheticNamedExports: false
 								}

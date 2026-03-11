@@ -254,7 +254,6 @@ export default class Module {
 	declare scope: ModuleScope;
 	readonly sideEffectDependenciesByVariable = new Map<Variable, Set<Module>>();
 	declare sourcemapChain: DecodedSourceMapOrMissing[];
-	readonly sourcePhaseSources = new Set<string>();
 	readonly sourcesWithAttributes = new Map<string, Record<string, string>>();
 	declare transformFiles?: EmittedFile[];
 
@@ -1228,9 +1227,6 @@ export default class Module {
 			}
 		} else {
 			this.sourcesWithAttributes.set(source, parsedAttributes);
-		}
-		if ((declaration as ImportDeclaration).phase === 'source') {
-			this.sourcePhaseSources.add(source);
 		}
 	}
 

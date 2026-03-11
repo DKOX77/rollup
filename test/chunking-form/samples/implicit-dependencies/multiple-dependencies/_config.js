@@ -138,6 +138,7 @@ module.exports = defineTest({
 							id: ID_LIB1,
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'rollup',
 							syntheticNamedExports: false
 						},
@@ -147,6 +148,7 @@ module.exports = defineTest({
 							id: ID_LIB1B,
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'rollup',
 							syntheticNamedExports: false
 						},
@@ -156,6 +158,7 @@ module.exports = defineTest({
 							id: ID_LIB2,
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'rollup',
 							syntheticNamedExports: false
 						}
@@ -273,6 +276,7 @@ module.exports = defineTest({
 							id: ID_LIB1,
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'rollup',
 							syntheticNamedExports: false
 						},
@@ -282,6 +286,7 @@ module.exports = defineTest({
 							id: ID_LIB1B,
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'rollup',
 							syntheticNamedExports: false
 						},
@@ -291,6 +296,7 @@ module.exports = defineTest({
 							id: ID_LIB3,
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'rollup',
 							syntheticNamedExports: false
 						}
@@ -407,6 +413,7 @@ module.exports = defineTest({
 							id: ID_LIB1,
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'rollup',
 							syntheticNamedExports: false
 						},
@@ -416,6 +423,7 @@ module.exports = defineTest({
 							id: ID_LIB2,
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'rollup',
 							syntheticNamedExports: false
 						},
@@ -425,6 +433,7 @@ module.exports = defineTest({
 							id: ID_LIB3,
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'rollup',
 							syntheticNamedExports: false
 						}

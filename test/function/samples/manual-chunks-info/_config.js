@@ -90,6 +90,7 @@ module.exports = defineTest({
 									id: 'external',
 									meta: {},
 									moduleSideEffects: true,
+									phase: 'evaluation',
 									resolvedBy: 'rollup',
 									syntheticNamedExports: false
 								}
@@ -109,6 +110,7 @@ module.exports = defineTest({
 									id: getId('lib'),
 									meta: {},
 									moduleSideEffects: true,
+									phase: 'evaluation',
 									resolvedBy: 'rollup',
 									syntheticNamedExports: false
 								}
@@ -253,6 +255,7 @@ module.exports = defineTest({
 									id: getId('dynamic'),
 									meta: {},
 									moduleSideEffects: true,
+									phase: 'evaluation',
 									resolvedBy: 'rollup',
 									syntheticNamedExports: false
 								}
@@ -276,6 +279,7 @@ module.exports = defineTest({
 									id: getId('lib'),
 									meta: {},
 									moduleSideEffects: true,
+									phase: 'evaluation',
 									resolvedBy: 'rollup',
 									syntheticNamedExports: false
 								},
@@ -285,6 +289,7 @@ module.exports = defineTest({
 									id: 'external',
 									meta: {},
 									moduleSideEffects: true,
+									phase: 'evaluation',
 									resolvedBy: 'rollup',
 									syntheticNamedExports: false
 								}

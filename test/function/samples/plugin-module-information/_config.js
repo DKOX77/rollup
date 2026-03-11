@@ -141,6 +141,7 @@ module.exports = defineTest({
 										id: ID_PATH,
 										meta: {},
 										moduleSideEffects: true,
+										phase: 'evaluation',
 										resolvedBy: 'rollup',
 										syntheticNamedExports: false
 									}
@@ -295,6 +296,7 @@ module.exports = defineTest({
 										id: ID_NESTED,
 										meta: {},
 										moduleSideEffects: true,
+										phase: 'evaluation',
 										resolvedBy: 'rollup',
 										syntheticNamedExports: false
 									},
@@ -304,6 +306,7 @@ module.exports = defineTest({
 										id: ID_PATH,
 										meta: {},
 										moduleSideEffects: true,
+										phase: 'evaluation',
 										resolvedBy: 'rollup',
 										syntheticNamedExports: false
 									}
@@ -326,6 +329,7 @@ module.exports = defineTest({
 										id: ID_FOO,
 										meta: {},
 										moduleSideEffects: true,
+										phase: 'evaluation',
 										resolvedBy: 'rollup',
 										syntheticNamedExports: false
 									}
@@ -425,6 +429,7 @@ module.exports = defineTest({
 										id: ID_FOO,
 										meta: {},
 										moduleSideEffects: true,
+										phase: 'evaluation',
 										resolvedBy: 'rollup',
 										syntheticNamedExports: false
 									}

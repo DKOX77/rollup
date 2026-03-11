@@ -91,6 +91,7 @@ module.exports = defineTest({
 							id: ID_LIB,
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'rollup',
 							syntheticNamedExports: false
 						}
@@ -171,6 +172,7 @@ module.exports = defineTest({
 							id: ID_LIB,
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'rollup',
 							syntheticNamedExports: false
 						}

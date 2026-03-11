@@ -68,6 +68,7 @@ export type ModuleLoaderResolveId = (
 type NormalizedResolveIdWithoutDefaults = Partial<PartialNull<ModuleOptions>> & {
 	external?: boolean | 'absolute';
 	id: string;
+	phase?: ImportPhase;
 	resolvedBy?: string;
 };
 
@@ -204,7 +205,7 @@ export class ModuleLoader {
 		resolvedId: { id: string; resolveDependencies?: boolean } & Partial<PartialNull<ModuleOptions>>
 	): Promise<ModuleInfo> {
 		const module = await this.fetchModule(
-			this.getResolvedIdWithDefaults(resolvedId, EMPTY_OBJECT)!,
+			this.getResolvedIdWithDefaults(resolvedId, EMPTY_OBJECT, 'evaluation')!,
 			undefined,
 			false,
 			resolvedId.resolveDependencies ? RESOLVE_DEPENDENCIES : true
@@ -243,7 +244,8 @@ export class ModuleLoader {
 				importer,
 				source
 			),
-			attributes
+			attributes,
+			phase
 		);
 
 	private addEntryWithImplicitDependants(
@@ -529,23 +531,16 @@ export class ModuleLoader {
 		module: Module,
 		resolveStaticDependencyPromises: readonly ResolveStaticDependencyPromise[]
 	): Promise<void> {
-		for (const { dependency, isSourcePhase } of await Promise.all(
+		for (const dependency of await Promise.all(
 			resolveStaticDependencyPromises.map(resolveStaticDependencyPromise =>
 				resolveStaticDependencyPromise.then(([source, resolvedId]) => {
-					const isSourcePhase = module.sourcePhaseSources.has(source);
-					if (isSourcePhase && !resolvedId.external) {
+					if (resolvedId.phase === 'source' && !resolvedId.external) {
 						return error(logNonExternalSourcePhaseImport(source, module.id));
 					}
-					return this.fetchResolvedDependency(source, module.id, resolvedId).then(dependency => ({
-						dependency,
-						isSourcePhase
-					}));
+					return this.fetchResolvedDependency(source, module.id, resolvedId);
 				})
 			)
 		)) {
-			if (isSourcePhase && dependency instanceof ExternalModule) {
-				dependency.hasSourcePhaseImport = true;
-			}
 			module.dependencies.add(dependency);
 			dependency.importers.push(module.id);
 		}
@@ -625,8 +620,16 @@ export class ModuleLoader {
 	}
 
 	private getResolveStaticDependencyPromises(module: Module): ResolveStaticDependencyPromise[] {
+		// Build a set of source specifiers that appear as source-phase imports in the AST,
+		// so we can pass the correct phase to the resolveId hook.
+		const astSourcePhaseSources = new Set<string>();
+		for (const description of module.importDescriptions.values()) {
+			if (description.phase === 'source') {
+				astSourcePhaseSources.add(description.source);
+			}
+		}
 		return Array.from(module.sourcesWithAttributes, async ([source, attributes]) => {
-			const phase = module.sourcePhaseSources.has(source) ? 'source' : 'evaluation';
+			const phase: ImportPhase = astSourcePhaseSources.has(source) ? 'source' : 'evaluation';
 			return [
 				source,
 				(module.resolvedIds[source] =
@@ -644,7 +647,8 @@ export class ModuleLoader {
 						),
 						source,
 						module.id,
-						attributes
+						attributes,
+						phase
 					))
 			] as const;
 		});
@@ -652,7 +656,8 @@ export class ModuleLoader {
 
 	private getResolvedIdWithDefaults(
 		resolvedId: NormalizedResolveIdWithoutDefaults | null,
-		attributes: Record<string, string>
+		attributes: Record<string, string>,
+		phase: ImportPhase
 	): ResolvedId | null {
 		if (!resolvedId) {
 			return null;
@@ -665,6 +670,7 @@ export class ModuleLoader {
 			meta: resolvedId.meta || {},
 			moduleSideEffects:
 				resolvedId.moduleSideEffects ?? this.hasModuleSideEffects(resolvedId.id, !!external),
+			phase,
 			resolvedBy: resolvedId.resolvedBy ?? 'rollup',
 			syntheticNamedExports: resolvedId.syntheticNamedExports ?? false
 		};
@@ -694,7 +700,8 @@ export class ModuleLoader {
 		resolvedId: ResolvedId | null,
 		source: string,
 		importer: string,
-		attributes: Record<string, string>
+		attributes: Record<string, string>,
+		phase: ImportPhase
 	): ResolvedId {
 		if (resolvedId === null) {
 			if (isRelative(source)) {
@@ -707,6 +714,7 @@ export class ModuleLoader {
 				id: source,
 				meta: {},
 				moduleSideEffects: this.hasModuleSideEffects(source, true),
+				phase,
 				resolvedBy: 'rollup',
 				syntheticNamedExports: false
 			};
@@ -760,7 +768,8 @@ export class ModuleLoader {
 				typeof resolveIdResult === 'object'
 					? (resolveIdResult as NormalizedResolveIdWithoutDefaults)
 					: { id: resolveIdResult },
-				EMPTY_OBJECT
+				EMPTY_OBJECT,
+				'evaluation'
 			)!,
 			undefined,
 			isEntry,
@@ -789,7 +798,8 @@ export class ModuleLoader {
 			}
 			return this.getResolvedIdWithDefaults(
 				resolution as NormalizedResolveIdWithoutDefaults,
-				attributes
+				attributes,
+				phase
 			);
 		}
 		if (resolution == null) {
@@ -808,30 +818,34 @@ export class ModuleLoader {
 				}
 				return existingResolution;
 			}
-			return (module.resolvedIds[specifier] = this.handleInvalidResolvedId(
-				await this.resolveId(
-					specifier,
-					module.id,
-					EMPTY_OBJECT,
-					false,
-					attributes,
-					module.info.attributes,
-					null,
-					phase
-				),
+			const resolvedId = await this.resolveId(
 				specifier,
 				module.id,
-				attributes
+				EMPTY_OBJECT,
+				false,
+				attributes,
+				module.info.attributes,
+				null,
+				phase
+			);
+			return (module.resolvedIds[specifier] = this.handleInvalidResolvedId(
+				resolvedId,
+				specifier,
+				module.id,
+				attributes,
+				phase
 			));
 		}
 		return this.handleInvalidResolvedId(
 			this.getResolvedIdWithDefaults(
 				this.getNormalizedResolvedIdWithoutDefaults(resolution, importer, specifier),
-				attributes
+				attributes,
+				phase
 			),
 			specifier,
 			importer,
-			attributes
+			attributes,
+			phase
 		);
 	}
 }

@@ -297,6 +297,7 @@ export interface HookFilter {
 export interface ResolvedId extends ModuleOptions {
 	external: boolean | 'absolute';
 	id: string;
+	phase: ImportPhase;
 	resolvedBy: string;
 }
 

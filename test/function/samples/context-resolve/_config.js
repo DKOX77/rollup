@@ -9,6 +9,7 @@ const tests = [
 			attributes: {},
 			external: false,
 			meta: {},
+			phase: 'evaluation',
 			resolvedBy: 'rollup',
 			moduleSideEffects: true,
 			syntheticNamedExports: false
@@ -29,6 +30,7 @@ const tests = [
 			attributes: {},
 			external: true,
 			meta: {},
+			phase: 'evaluation',
 			moduleSideEffects: true,
 			resolvedBy: 'rollup',
 			syntheticNamedExports: false
@@ -41,6 +43,7 @@ const tests = [
 			attributes: {},
 			external: true,
 			meta: {},
+			phase: 'evaluation',
 			moduleSideEffects: true,
 			resolvedBy: 'rollup',
 			syntheticNamedExports: false
@@ -53,6 +56,7 @@ const tests = [
 			attributes: {},
 			external: true,
 			meta: {},
+			phase: 'evaluation',
 			moduleSideEffects: true,
 			resolvedBy: 'rollup',
 			syntheticNamedExports: false
@@ -65,6 +69,7 @@ const tests = [
 			attributes: {},
 			external: false,
 			meta: {},
+			phase: 'evaluation',
 			moduleSideEffects: true,
 			resolvedBy: 'at position 2',
 			syntheticNamedExports: false
@@ -77,6 +82,7 @@ const tests = [
 			attributes: {},
 			external: true,
 			meta: {},
+			phase: 'evaluation',
 			resolvedBy: 'rollup',
 			moduleSideEffects: true,
 			syntheticNamedExports: false
@@ -89,6 +95,7 @@ const tests = [
 			attributes: {},
 			external: false,
 			meta: {},
+			phase: 'evaluation',
 			moduleSideEffects: true,
 			resolvedBy: 'at position 2',
 			syntheticNamedExports: false
@@ -101,6 +108,7 @@ const tests = [
 			attributes: {},
 			external: false,
 			meta: {},
+			phase: 'evaluation',
 			moduleSideEffects: true,
 			resolvedBy: 'at position 2',
 			syntheticNamedExports: false
@@ -113,6 +121,7 @@ const tests = [
 			attributes: {},
 			external: true,
 			meta: {},
+			phase: 'evaluation',
 			moduleSideEffects: true,
 			resolvedBy: 'at position 2',
 			syntheticNamedExports: false

@@ -17,6 +17,7 @@ module.exports = defineTest({
 							id: 'external',
 							meta: {},
 							moduleSideEffects: true,
+							phase: 'evaluation',
 							resolvedBy: 'third',
 							syntheticNamedExports: false
 						}

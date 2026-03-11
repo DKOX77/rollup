@@ -325,6 +325,7 @@ describe('incremental', () => {
 						external: false,
 						meta: {},
 						moduleSideEffects: true,
+						phase: 'evaluation',
 						resolvedBy: 'at position 1',
 						syntheticNamedExports: false
 					},
@@ -334,6 +335,7 @@ describe('incremental', () => {
 						external: true,
 						meta: {},
 						moduleSideEffects: true,
+						phase: 'evaluation',
 						resolvedBy: 'rollup',
 						syntheticNamedExports: false
 					}
@@ -424,6 +426,7 @@ describe('incremental', () => {
 								id: 'bar',
 								meta: {},
 								moduleSideEffects: true,
+								phase: 'evaluation',
 								resolvedBy: 'at position 1',
 								syntheticNamedExports: false
 							}
@@ -446,6 +449,7 @@ describe('incremental', () => {
 								id: 'foo',
 								meta: {},
 								moduleSideEffects: true,
+								phase: 'evaluation',
 								resolvedBy: 'at position 1',
 								syntheticNamedExports: false
 							}
