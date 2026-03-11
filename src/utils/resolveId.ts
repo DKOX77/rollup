@@ -1,5 +1,11 @@
 import type { ModuleLoaderResolveId } from '../ModuleLoader';
-import type { CustomPluginOptions, Plugin, ResolveIdResult, RollupFsModule } from '../rollup/types';
+import type {
+	CustomPluginOptions,
+	ImportPhase,
+	Plugin,
+	ResolveIdResult,
+	RollupFsModule
+} from '../rollup/types';
 import { basename, dirname, isAbsolute, resolve } from './path';
 import type { PluginDriver } from './PluginDriver';
 import { resolveIdViaPlugins } from './resolveIdViaPlugins';
@@ -15,7 +21,8 @@ export async function resolveId(
 	isEntry: boolean,
 	attributes: Record<string, string>,
 	importerAttributes: Record<string, string> | undefined,
-	fs: RollupFsModule
+	fs: RollupFsModule,
+	phase: ImportPhase
 ): Promise<ResolveIdResult> {
 	const pluginResult = await resolveIdViaPlugins(
 		source,
@@ -26,7 +33,8 @@ export async function resolveId(
 		customOptions,
 		isEntry,
 		attributes,
-		importerAttributes
+		importerAttributes,
+		phase
 	);
 
 	if (pluginResult != null) {

@@ -6,6 +6,7 @@ import type {
 	CustomPluginOptions,
 	EmittedChunk,
 	HasModuleSideEffects,
+	ImportPhase,
 	LoadResult,
 	ModuleInfo,
 	ModuleOptions,
@@ -60,7 +61,8 @@ export type ModuleLoaderResolveId = (
 	isEntry: boolean | undefined,
 	attributes: Record<string, string>,
 	importerAttributes: Record<string, string> | undefined,
-	skip?: readonly { importer: string | undefined; plugin: Plugin; source: string }[] | null
+	skip?: readonly { importer: string | undefined; plugin: Plugin; source: string }[] | null,
+	phase?: ImportPhase
 ) => Promise<ResolvedId | null>;
 
 type NormalizedResolveIdWithoutDefaults = Partial<PartialNull<ModuleOptions>> & {
@@ -217,7 +219,8 @@ export class ModuleLoader {
 		isEntry,
 		attributes,
 		importerAttributes,
-		skip = null
+		skip = null,
+		phase = 'evaluation'
 	) =>
 		this.getResolvedIdWithDefaults(
 			this.getNormalizedResolvedIdWithoutDefaults(
@@ -234,7 +237,8 @@ export class ModuleLoader {
 							typeof isEntry === 'boolean' ? isEntry : !importer,
 							attributes,
 							importerAttributes,
-							this.options.fs
+							this.options.fs,
+							phase
 						),
 				importer,
 				source
@@ -607,7 +611,8 @@ export class ModuleLoader {
 				module,
 				dynamicImport.argument,
 				module.id,
-				getAttributesFromImportExpression(dynamicImport.node)
+				getAttributesFromImportExpression(dynamicImport.node),
+				dynamicImport.node.phase ?? 'evaluation'
 			);
 			if (!resolvedId || typeof resolvedId === 'string') {
 				dynamicImport.node.shouldIncludeDynamicAttributes = true;
@@ -620,28 +625,29 @@ export class ModuleLoader {
 	}
 
 	private getResolveStaticDependencyPromises(module: Module): ResolveStaticDependencyPromise[] {
-		return Array.from(
-			module.sourcesWithAttributes,
-			async ([source, attributes]) =>
-				[
-					source,
-					(module.resolvedIds[source] =
-						module.resolvedIds[source] ||
-						this.handleInvalidResolvedId(
-							await this.resolveId(
-								source,
-								module.id,
-								EMPTY_OBJECT,
-								false,
-								attributes,
-								module.info.attributes
-							),
+		return Array.from(module.sourcesWithAttributes, async ([source, attributes]) => {
+			const phase = module.sourcePhaseSources.has(source) ? 'source' : 'evaluation';
+			return [
+				source,
+				(module.resolvedIds[source] =
+					module.resolvedIds[source] ||
+					this.handleInvalidResolvedId(
+						await this.resolveId(
 							source,
 							module.id,
-							attributes
-						))
-				] as const
-		);
+							EMPTY_OBJECT,
+							false,
+							attributes,
+							module.info.attributes,
+							null,
+							phase
+						),
+						source,
+						module.id,
+						attributes
+					))
+			] as const;
+		});
 	}
 
 	private getResolvedIdWithDefaults(
@@ -729,7 +735,8 @@ export class ModuleLoader {
 			true,
 			EMPTY_OBJECT,
 			importerAttributes,
-			this.options.fs
+			this.options.fs,
+			'evaluation'
 		);
 		if (resolveIdResult == null) {
 			return error(
@@ -765,7 +772,8 @@ export class ModuleLoader {
 		module: Module,
 		specifier: string | AstNode,
 		importer: string,
-		attributes: Record<string, string>
+		attributes: Record<string, string>,
+		phase: ImportPhase
 	): Promise<ResolvedId | string | null> {
 		const resolution = await this.pluginDriver.hookFirst('resolveDynamicImport', [
 			specifier,
@@ -807,7 +815,9 @@ export class ModuleLoader {
 					EMPTY_OBJECT,
 					false,
 					attributes,
-					module.info.attributes
+					module.info.attributes,
+					null,
+					phase
 				),
 				specifier,
 				module.id,

@@ -1,5 +1,11 @@
 import type { ModuleLoaderResolveId } from '../ModuleLoader';
-import type { CustomPluginOptions, Plugin, PluginContext, ResolveIdResult } from '../rollup/types';
+import type {
+	CustomPluginOptions,
+	ImportPhase,
+	Plugin,
+	PluginContext,
+	ResolveIdResult
+} from '../rollup/types';
 import type { PluginDriver, ReplaceContext } from './PluginDriver';
 import { BLANK, EMPTY_OBJECT } from './blank';
 
@@ -12,7 +18,8 @@ export function resolveIdViaPlugins(
 	customOptions: CustomPluginOptions | undefined,
 	isEntry: boolean,
 	attributes: Record<string, string>,
-	importerAttributes: Record<string, string> | undefined
+	importerAttributes: Record<string, string> | undefined,
+	phase: ImportPhase
 ): Promise<[NonNullable<ResolveIdResult>, Plugin] | null> {
 	let skipped: Set<Plugin> | null = null;
 	let replaceContext: ReplaceContext | null = null;
@@ -28,7 +35,7 @@ export function resolveIdViaPlugins(
 			resolve: (
 				source,
 				importer,
-				{ attributes, custom, isEntry, skipSelf, importerAttributes } = BLANK
+				{ attributes, custom, isEntry, skipSelf, importerAttributes, phase: resolvePhase } = BLANK
 			) => {
 				skipSelf ??= true;
 				if (
@@ -52,14 +59,15 @@ export function resolveIdViaPlugins(
 					isEntry,
 					attributes || EMPTY_OBJECT,
 					importerAttributes,
-					skipSelf ? [...skip, { importer, plugin, source }] : skip
+					skipSelf ? [...skip, { importer, plugin, source }] : skip,
+					resolvePhase
 				);
 			}
 		});
 	}
 	return pluginDriver.hookFirstAndGetPlugin(
 		'resolveId',
-		[source, importer, { attributes, custom: customOptions, importerAttributes, isEntry }],
+		[source, importer, { attributes, custom: customOptions, importerAttributes, isEntry, phase }],
 		replaceContext,
 		skipped
 	);

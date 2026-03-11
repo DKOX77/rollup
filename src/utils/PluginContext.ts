@@ -78,7 +78,7 @@ export function getPluginContext(
 		resolve(
 			source,
 			importer,
-			{ attributes, custom, isEntry, skipSelf, importerAttributes } = BLANK
+			{ attributes, custom, isEntry, skipSelf, importerAttributes, phase } = BLANK
 		) {
 			skipSelf ??= true;
 			return graph.moduleLoader.resolveId(
@@ -88,7 +88,8 @@ export function getPluginContext(
 				isEntry,
 				attributes || EMPTY_OBJECT,
 				importerAttributes,
-				skipSelf ? [{ importer, plugin, source }] : null
+				skipSelf ? [{ importer, plugin, source }] : null,
+				phase
 			);
 		},
 		setAssetSource: fileEmitter.setAssetSource,

@@ -265,6 +265,7 @@ export interface PluginContext extends MinimalPluginContext {
 			attributes?: Record<string, string>;
 			custom?: CustomPluginOptions;
 			isEntry?: boolean;
+			phase?: ImportPhase;
 			skipSelf?: boolean;
 		}
 	) => Promise<ResolvedId | null>;
@@ -276,6 +277,8 @@ export interface PluginContextMeta {
 	rollupVersion: string;
 	watchMode: boolean;
 }
+
+export type ImportPhase = 'source' | 'defer' | 'evaluation';
 
 export type StringOrRegExp = string | RegExp;
 
@@ -318,6 +321,7 @@ export type ResolveIdHook = (
 		custom?: CustomPluginOptions;
 		importerAttributes?: Record<string, string> | undefined;
 		isEntry: boolean;
+		phase: ImportPhase;
 	}
 ) => ResolveIdResult;
 
